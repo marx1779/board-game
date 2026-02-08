@@ -592,6 +592,106 @@ const QUESTIONS = [
   "영어 단어 3가지",
   "3글자 이름 3가지",
   "감정 표현 3가지",
+  "중국 음식 3가지",
+  "일본 음식 3가지",
+  "이탈리아 음식 3가지",
+  "멕시코 음식 3가지",
+  "분식집 메뉴 3가지",
+  "카페 메뉴 3가지",
+  "패스트푸드 메뉴 3가지",
+  "배달 음식 3가지",
+  "야식으로 먹는 것 3가지",
+  "반찬 종류 3가지",
+  "국 종류 3가지",
+  "찌개 종류 3가지",
+  "구이 종류 3가지",
+  "튀김 종류 3가지",
+  "떡 종류 3가지",
+  "아이스크림 브랜드 3가지",
+  "초콜릿 브랜드 3가지",
+  "음료수 종류 3가지",
+  "술 종류 3가지",
+  "열대 과일 3가지",
+  "견과류 3가지",
+  "해산물 3가지",
+  "버섯 종류 3가지",
+  "허브 또는 향신료 3가지",
+  "파충류 3가지",
+  "곤충 3가지",
+  "새 종류 3가지",
+  "강아지 품종 3가지",
+  "고양이 품종 3가지",
+  "멸종 위기 동물 3가지",
+  "농장에 있는 동물 3가지",
+  "야행성 동물 3가지",
+  "줄무늬가 있는 동물 3가지",
+  "물속에서 사는 동물 3가지",
+  "남미 나라 3가지",
+  "아프리카 나라 3가지",
+  "동남아시아 나라 3가지",
+  "영어를 공용어로 쓰는 나라 3가지",
+  "섬나라 3가지",
+  "수도가 유명한 나라 3가지",
+  "올림픽 개최 도시 3가지",
+  "한국 도시 3가지",
+  "일본 도시 3가지",
+  "미국 도시 3가지",
+  "유럽 도시 3가지",
+  "강 이름 3가지",
+  "호수 이름 3가지",
+  "바다 이름 3가지",
+  "사막 이름 3가지",
+  "화산 이름 3가지",
+  "축구 선수 3가지",
+  "야구 선수 3가지",
+  "농구 선수 3가지",
+  "수영 종목 3가지",
+  "겨울 스포츠 3가지",
+  "격투기 종류 3가지",
+  "올림픽 종목 3가지",
+  "보드게임 3가지",
+  "카드게임 3가지",
+  "온라인 게임 3가지",
+  "닌텐도 게임 3가지",
+  "공원에서 하는 놀이 3가지",
+  "물놀이 종류 3가지",
+  "실내에서 하는 취미 3가지",
+  "야외에서 하는 취미 3가지",
+  "악기 중 현악기 3가지",
+  "악기 중 타악기 3가지",
+  "음악 장르 3가지",
+  "한국 가수 3가지",
+  "외국 가수 3가지",
+  "뮤지컬 작품 3가지",
+  "클래식 작곡가 3가지",
+  "영화 장르 3가지",
+  "마블 영화 3가지",
+  "지브리 애니메이션 3가지",
+  "한국 웹툰 3가지",
+  "유명한 소설 3가지",
+  "동화 이름 3가지",
+  "과학자 이름 3가지",
+  "발명품 3가지",
+  "행성 이름 3가지",
+  "별자리 이름 3가지",
+  "원소 이름 3가지",
+  "프로그래밍 언어 3가지",
+  "IT 기업 3가지",
+  "가전제품 3가지",
+  "주방 가전 3가지",
+  "청소 도구 3가지",
+  "문구점에서 파는 것 3가지",
+  "약국에서 파는 것 3가지",
+  "마트에서 파는 것 3가지",
+  "백화점 층별 매장 3가지",
+  "놀이공원 놀이기구 3가지",
+  "공항에서 볼 수 있는 것 3가지",
+  "지하철에서 볼 수 있는 것 3가지",
+  "도서관에서 볼 수 있는 것 3가지",
+  "교실에 있는 것 3가지",
+  "운동장에 있는 것 3가지",
+  "지갑에 들어있는 것 3가지",
+  "가방에 넣고 다니는 것 3가지",
 ];
 
 // ===== 게임 상태 =====
@@ -602,6 +702,8 @@ const PLAYER_COLORS = [
 
 let players = [];
 let currentPlayerIndex = 0;
+let turnOrder = [];       // 현재 세트의 플레이어 순서
+let turnPosition = 0;     // 현재 세트 내 몇 번째 차례인지
 let targetScore = 5;
 let usedQuestions = [];
 let currentQuestion = '';
@@ -705,11 +807,22 @@ playerNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') addPla
 startBtn.addEventListener('click', () => {
   targetScore = parseInt(targetScoreInput.value) || 5;
   players.forEach(p => p.score = 0);
-  currentPlayerIndex = 0;
   usedQuestions = [];
+  shuffleTurnOrder();
+  currentPlayerIndex = turnOrder[turnPosition];
   showScreen(gameScreen);
   startTurn();
 });
+
+// ===== 순서 셔플 (Fisher-Yates) =====
+function shuffleTurnOrder() {
+  turnOrder = players.map((_, i) => i);
+  for (let i = turnOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [turnOrder[i], turnOrder[j]] = [turnOrder[j], turnOrder[i]];
+  }
+  turnPosition = 0;
+}
 
 // ===== 화면 전환 =====
 function showScreen(screen) {
@@ -728,6 +841,16 @@ function getRandomQuestion() {
   return q;
 }
 
+// ===== 다음 턴으로 =====
+function nextTurn() {
+  turnPosition++;
+  if (turnPosition >= turnOrder.length) {
+    shuffleTurnOrder();
+  }
+  currentPlayerIndex = turnOrder[turnPosition];
+  startTurn();
+}
+
 // ===== 턴 시작 =====
 function startTurn() {
   // 카드 리셋
@@ -743,7 +866,7 @@ function startTurn() {
 
   // 현재 플레이어
   const player = players[currentPlayerIndex];
-  turnInfo.textContent = `라운드 진행 중`;
+  turnInfo.textContent = `${turnPosition + 1} / ${players.length} 번째 차례`;
   currentPlayerNameEl.textContent = player.name;
   currentPlayerNameEl.style.color = player.color;
 
@@ -840,14 +963,12 @@ judgeSuccess.addEventListener('click', () => {
     return;
   }
 
-  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-  startTurn();
+  nextTurn();
 });
 
 judgeFail.addEventListener('click', () => {
   playFail();
-  currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-  startTurn();
+  nextTurn();
 });
 
 // ===== 점수판 =====
