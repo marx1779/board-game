@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>사보타주 - 온라인 보드게임</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- ===== 로비 ===== -->
+  <div id="lobby-screen" class="screen active">
+    <div class="lobby-title">
+      <h1>⛏️ 사보타주</h1>
+      <p>SABOTEUR - 온라인 멀티플레이어</p>
+    </div>
+    <div class="lobby-card">
+      <div id="lobby-menu">
+        <input type="text" id="nickname" placeholder="닉네임 (최대 10자)" maxlength="10">
+        <button class="btn btn-primary" id="btn-create">방 만들기</button>
+        <div class="divider">또는</div>
+        <input type="text" id="room-code-input" placeholder="방 코드 (4자리)" maxlength="4" style="text-transform:uppercase">
+        <button class="btn btn-secondary" id="btn-join">방 참가</button>
+      </div>
+
+      <div id="waiting-room" style="display:none">
+        <div class="room-code-display">
+          방 코드: <span id="room-code-label"></span>
+        </div>
+        <h3>플레이어 목록</h3>
+        <ul id="player-list-lobby"></ul>
+        <p class="player-count" id="player-count-label"></p>
+        <button class="btn btn-primary" id="btn-start-game" style="display:none">게임 시작</button>
+        <p class="hint">최소 3명이 필요합니다</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 게임 ===== -->
+  <div id="game-screen" class="screen">
+    <!-- 상단: 게임 정보 -->
+    <div id="game-header">
+      <div id="role-badge"></div>
+      <div id="turn-info"></div>
+      <div id="deck-count"></div>
+    </div>
+
+    <!-- 플레이어 목록 -->
+    <div id="players-panel"></div>
+
+    <!-- 보드 -->
+    <div id="board-container">
+      <canvas id="board-canvas"></canvas>
+    </div>
+
+    <!-- 액션 버튼 -->
+    <div id="action-bar">
+      <button class="btn btn-small" id="btn-rotate">🔄 회전</button>
+      <button class="btn btn-small btn-danger" id="btn-discard">🗑️ 버리기</button>
+    </div>
+
+    <!-- 손패 -->
+    <div id="hand-container">
+      <div id="hand-cards"></div>
+    </div>
+
+    <!-- 게임 로그 -->
+    <div id="game-log"></div>
+  </div>
+
+  <!-- ===== 모달: 대상 선택 ===== -->
+  <div id="modal-overlay" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <h3 id="modal-title"></h3>
+      <div id="modal-content"></div>
+      <button class="btn btn-small" id="modal-cancel">취소</button>
+    </div>
+  </div>
+
+  <!-- ===== 게임 종료 ===== -->
+  <div id="gameover-overlay" class="modal-overlay" style="display:none">
+    <div class="modal gameover-modal">
+      <div id="gameover-icon"></div>
+      <h2 id="gameover-title"></h2>
+      <div id="gameover-roles"></div>
+      <button class="btn btn-primary" id="btn-back-lobby">로비로 돌아가기</button>
+    </div>
+  </div>
+
+  <!-- 에러 토스트 -->
+  <div id="toast" class="toast"></div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

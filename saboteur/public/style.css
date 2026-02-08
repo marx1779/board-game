@@ -1,0 +1,315 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+#app { width: 100%; height: 100vh; position: relative; }
+
+.screen { display: none; width: 100%; height: 100%; }
+.screen.active { display: flex; }
+
+/* ===== 로비 ===== */
+#lobby-screen {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+.lobby-title { text-align: center; margin-bottom: 30px; }
+.lobby-title h1 { font-size: 3rem; color: #e2b04a; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+.lobby-title p { color: #aaa; margin-top: 8px; }
+
+.lobby-card {
+  background: #16213e;
+  border-radius: 16px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+  border: 1px solid #1a3a5c;
+}
+
+.lobby-card input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #1a3a5c;
+  border-radius: 10px;
+  font-size: 1rem;
+  margin-bottom: 12px;
+  background: #0f1a2e;
+  color: #eee;
+  outline: none;
+}
+.lobby-card input:focus { border-color: #e2b04a; }
+.lobby-card input::placeholder { color: #667; }
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.15s;
+  width: 100%;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); opacity: 0.9; }
+
+.btn-primary { background: linear-gradient(135deg, #e2b04a, #d4943a); color: #1a1a2e; }
+.btn-secondary { background: #1a3a5c; color: #ddd; }
+.btn-danger { background: #c0392b; color: #fff; }
+.btn-small { width: auto; padding: 8px 16px; font-size: 0.85rem; }
+
+.divider {
+  text-align: center;
+  color: #556;
+  margin: 16px 0;
+  font-size: 0.9rem;
+}
+
+.room-code-display {
+  text-align: center;
+  padding: 16px;
+  background: #0f1a2e;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  font-size: 1.1rem;
+}
+.room-code-display span {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #e2b04a;
+  letter-spacing: 6px;
+  display: block;
+  margin-top: 8px;
+}
+
+#player-list-lobby {
+  list-style: none;
+  margin: 12px 0;
+}
+#player-list-lobby li {
+  padding: 8px 12px;
+  background: #0f1a2e;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+#player-list-lobby li .host-badge {
+  background: #e2b04a;
+  color: #1a1a2e;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.player-count { color: #889; font-size: 0.9rem; margin: 8px 0; text-align: center; }
+.hint { color: #556; font-size: 0.8rem; text-align: center; margin-top: 10px; }
+
+/* ===== 게임 화면 ===== */
+#game-screen {
+  flex-direction: column;
+  height: 100vh;
+}
+
+#game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: #16213e;
+  border-bottom: 1px solid #1a3a5c;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+#role-badge {
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+#role-badge.miner { background: #27ae60; color: #fff; }
+#role-badge.saboteur { background: #c0392b; color: #fff; }
+
+#turn-info { font-size: 0.95rem; color: #ccc; flex: 1; text-align: center; }
+#deck-count { font-size: 0.85rem; color: #889; white-space: nowrap; }
+
+/* 플레이어 패널 */
+#players-panel {
+  display: flex;
+  gap: 6px;
+  padding: 6px 10px;
+  overflow-x: auto;
+  background: #121e33;
+  flex-shrink: 0;
+}
+.player-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #1a2a44;
+  border-radius: 8px;
+  padding: 6px 10px;
+  min-width: 70px;
+  font-size: 0.75rem;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.player-chip.current-turn { border-color: #e2b04a; }
+.player-chip .p-name { font-weight: 700; margin-bottom: 4px; white-space: nowrap; }
+.player-chip .p-cards { color: #889; }
+.player-chip .p-tools { display: flex; gap: 2px; margin-top: 3px; }
+.player-chip .tool { font-size: 0.7rem; opacity: 0.4; }
+.player-chip .tool.ok { opacity: 1; }
+
+/* 보드 */
+#board-container {
+  flex: 1;
+  overflow: auto;
+  background: #0d1520;
+  position: relative;
+  min-height: 0;
+}
+#board-canvas { display: block; }
+
+/* 액션 바 */
+#action-bar {
+  display: flex;
+  gap: 8px;
+  padding: 6px 10px;
+  background: #16213e;
+  justify-content: center;
+  flex-shrink: 0;
+  border-top: 1px solid #1a3a5c;
+}
+
+/* 손패 */
+#hand-container {
+  background: #16213e;
+  padding: 8px 10px;
+  border-top: 1px solid #1a3a5c;
+  flex-shrink: 0;
+}
+#hand-cards {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  justify-content: center;
+}
+.hand-card {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 3px solid #2a3a55;
+  transition: transform 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+  position: relative;
+}
+.hand-card:hover { transform: translateY(-4px); border-color: #556; }
+.hand-card.selected { border-color: #e2b04a; transform: translateY(-6px); box-shadow: 0 4px 12px rgba(226,176,74,0.4); }
+.hand-card canvas { border-radius: 5px; }
+
+/* 게임 로그 */
+#game-log {
+  position: fixed;
+  bottom: 140px;
+  left: 10px;
+  max-width: 280px;
+  pointer-events: none;
+  z-index: 50;
+}
+.log-entry {
+  background: rgba(0,0,0,0.7);
+  color: #ccc;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+  animation: fadeInUp 0.3s;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 모달 */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+}
+.modal {
+  background: #16213e;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90%;
+  border: 1px solid #1a3a5c;
+}
+.modal h3 { text-align: center; margin-bottom: 16px; color: #e2b04a; }
+
+.modal-option {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: #0f1a2e;
+  border: 2px solid #1a3a5c;
+  border-radius: 8px;
+  color: #ddd;
+  font-size: 0.95rem;
+  cursor: pointer;
+  margin-bottom: 8px;
+  text-align: left;
+}
+.modal-option:hover { border-color: #e2b04a; }
+
+#modal-cancel { margin-top: 10px; }
+
+.gameover-modal { text-align: center; }
+.gameover-modal #gameover-icon { font-size: 4rem; margin-bottom: 12px; }
+.gameover-modal h2 { margin-bottom: 20px; }
+.gameover-modal .role-line { padding: 6px 0; font-size: 0.95rem; }
+.gameover-modal .role-line .role-miner { color: #27ae60; }
+.gameover-modal .role-line .role-saboteur { color: #c0392b; }
+#btn-back-lobby { margin-top: 20px; }
+
+/* 토스트 */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #c0392b;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.toast.show { opacity: 1; }
+
+/* 반응형 */
+@media (max-width: 480px) {
+  .lobby-title h1 { font-size: 2.2rem; }
+  .lobby-card { padding: 20px; }
+  .hand-card { width: 56px; height: 56px; }
+  .player-chip { min-width: 60px; padding: 4px 6px; }
+}
